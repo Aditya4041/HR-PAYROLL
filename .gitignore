@@ -1,0 +1,21 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Build output
+build/classes/db/
+build/classes/servlet/
+*.class
+
+# IDE
+.idea/
+*.iml
+target/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

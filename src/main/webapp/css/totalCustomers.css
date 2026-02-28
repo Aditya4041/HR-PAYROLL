@@ -1,0 +1,10 @@
+body { font-family: Arial, sans-serif; background-color: #e8e4fc; margin: 0; }
+h2 { text-align: center; color: #2b0d73; margin-top: 20px; }
+.search-container { text-align: center; margin: 10px 0; }
+.search-container input { width: 40%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+.table-container { overflow-x: auto; margin: 20px; border: 1px solid #ccc; background: #fff; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+table { border-collapse: collapse; width: 100%; font-size: 12px; white-space: nowrap; }
+th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+th { background-color: #2b0d73; color: white; text-align: center; position: sticky; top: 0; z-index: 2; }
+tr:nth-child(even) { background-color: #f9f9f9; }
+.no-data { text-align: center; color: red; font-weight: bold; padding: 10px; }

@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f7fa; color: #1a1a1a; }
+.dashboard-container { display: flex; justify-content: center; align-items: flex-start; padding: 40px; background-color: #e8e4fc; min-height: 100vh; width: 100%; }
+.cards-wrapper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; padding: 0; width: 100%; max-width: 1400px; }
+.card { background: linear-gradient(135deg, #4a9eff 0%, #3d85d9 100%); color: white; padding: 18px 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; overflow: hidden; cursor: pointer; min-height: 100px; display: flex; flex-direction: column; justify-content: space-between; }
+.card::before, .card::after { content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); pointer-events: none; }
+.card::before { width: 140px; height: 140px; top: -40px; right: -40px; }
+.card::after { width: 200px; height: 200px; bottom: -70px; left: -70px; }
+.card h3 { font-size: 16px; font-weight: 600; margin: 0 0 10px 0; position: relative; z-index: 1; line-height: 1.25; min-height: 40px; word-wrap: break-word; }
+.card p { font-size: 28px; font-weight: 700; margin: 0; position: relative; z-index: 1; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.2; display: block; width: 100%; hyphens: none; }
+.card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 12px 30px rgba(74,158,255,0.35); }
+.card:active { transform: scale(0.97); }
+.error-message { grid-column: 1 / -1; color: #dc2626; background: #fee2e2; padding: 20px; border-radius: 8px; text-align: center; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.loading { animation: pulse 1.5s ease-in-out infinite; }
+@media (max-width: 1200px) { .dashboard-container { padding: 30px; } .cards-wrapper { gap: 25px; grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .dashboard-container { padding: 25px; } .cards-wrapper { gap: 20px; grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .dashboard-container { padding: 20px 15px; } .cards-wrapper { gap: 18px; grid-template-columns: 1fr; } .card { padding: 16px 18px; min-height: 140px; } }
