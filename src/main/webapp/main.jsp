@@ -160,7 +160,7 @@
     <header>
         <div class="title-row">
             <div class="bank-section">
-                <div class="bank-icon">🏢</div>
+                <div class="bank-icon">🏦</div>
                 <h1 class="bank-title" id="bankNameTitle">Loading...</h1>
             </div>
             <div class="branch-section">
