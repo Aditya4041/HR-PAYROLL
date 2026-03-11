@@ -51,26 +51,19 @@
     // ── Check if password change is needed ────────────────────────────────────
     boolean needsPasswordChange = false;
     {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        Connection conn = null; PreparedStatement pstmt = null; ResultSet rs = null;
         try {
             conn = DBConnection.getConnection();
-            String sql =
-                "SELECT USER_ID, CREATED_BY FROM ACL.USERREGISTER " +
-                "WHERE USER_ID=? AND BRANCH_CODE=?";
+            String sql = "SELECT USER_ID, CREATED_BY FROM ACL.USERREGISTER WHERE USER_ID=? AND BRANCH_CODE=?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userId);
-            pstmt.setString(2, branchCode);
+            pstmt.setString(1, userId); pstmt.setString(2, branchCode);
             rs = pstmt.executeQuery();
             if (rs.next()) {
                 String createdBy = rs.getString("CREATED_BY");
-                if (createdBy != null && !userId.equals(createdBy))
-                    needsPasswordChange = true;
+                if (createdBy != null && !userId.equals(createdBy)) needsPasswordChange = true;
             }
-        } catch (Exception e) {
-            System.err.println("Password check error: " + e.getMessage());
-        } finally {
+        } catch (Exception e) { System.err.println("Password check error: " + e.getMessage()); }
+        finally {
             try { if (rs    != null) rs.close();    } catch (Exception ignored) {}
             try { if (pstmt != null) pstmt.close(); } catch (Exception ignored) {}
             try { if (conn  != null) conn.close();  } catch (Exception ignored) {}
@@ -79,8 +72,7 @@
 
     // ── Fetch branch name ─────────────────────────────────────────────────────
     try (Connection c = DBConnection.getConnection();
-         PreparedStatement ps = c.prepareStatement(
-             "SELECT NAME FROM HEADOFFICE.BRANCH WHERE BRANCH_CODE=?")) {
+         PreparedStatement ps = c.prepareStatement("SELECT NAME FROM HEADOFFICE.BRANCH WHERE BRANCH_CODE=?")) {
         ps.setString(1, branchCode);
         ResultSet rsBranch = ps.executeQuery();
         if (rsBranch.next()) branchName = rsBranch.getString("NAME");
@@ -88,12 +80,10 @@
 
     // ── Fetch user full name ──────────────────────────────────────────────────
     try (Connection c = DBConnection.getConnection();
-         PreparedStatement ps = c.prepareStatement(
-             "SELECT NAME FROM ACL.USERREGISTER WHERE USER_ID=?")) {
+         PreparedStatement ps = c.prepareStatement("SELECT NAME FROM ACL.USERREGISTER WHERE USER_ID=?")) {
         ps.setString(1, userId);
         ResultSet rsUser = ps.executeQuery();
-        if (rsUser.next() && rsUser.getString("NAME") != null)
-            userName = rsUser.getString("NAME");
+        if (rsUser.next() && rsUser.getString("NAME") != null) userName = rsUser.getString("NAME");
     } catch (Exception e) { /* userName defaults to userId */ }
 %>
 
@@ -108,7 +98,8 @@
 <body>
 
 <!-- ═══════════ SIDEBAR ═══════════ -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
+
     <div class="profile-section">
         <img src="images/user.png" alt="Profile" class="profile-pic">
         <div class="user-name"><%= userName.toUpperCase() %></div>
@@ -116,50 +107,57 @@
 
     <ul class="menu">
 
-        <!-- Dashboard -->
         <li class="active" data-page="Dashboard/dashboard.jsp">
             <a href="#" onclick="loadPage('Dashboard/dashboard.jsp','Dashboard',this);return false;">
-                <img src="images/right-arrow.png" width="18" height="18" alt="">
-                <span>Dashboard</span>
+                <img src="images/right-arrow.png" class="menu-icon-img" width="20" height="20" alt="">
+                <span class="menu-label">Dashboard</span>
             </a>
+            <span class="tooltip-label">Dashboard</span>
         </li>
 
-        <!-- Masters -->
         <li data-page="Masters/masters.jsp">
             <a href="#" onclick="loadPage('Masters/masters.jsp','Masters',this);return false;">
-                <img src="images/right-arrow.png" width="18" height="18" alt="">
-                <span>Masters</span>
+                <img src="images/right-arrow.png" class="menu-icon-img" width="20" height="20" alt="">
+                <span class="menu-label">Masters</span>
             </a>
+            <span class="tooltip-label">Masters</span>
         </li>
 
-        <!-- Entry -->
         <li data-page="Entry/entry.jsp">
             <a href="#" onclick="loadPage('Entry/entry.jsp','Entry',this);return false;">
-                <img src="images/right-arrow.png" width="18" height="18" alt="">
-                <span>Entry</span>
+                <img src="images/right-arrow.png" class="menu-icon-img" width="20" height="20" alt="">
+                <span class="menu-label">Entry</span>
             </a>
+            <span class="tooltip-label">Entry</span>
         </li>
 
-        <!-- View -->
         <li data-page="View/view.jsp">
             <a href="#" onclick="loadPage('View/view.jsp','View',this);return false;">
-                <img src="images/right-arrow.png" width="18" height="18" alt="">
-                <span>View</span>
+                <img src="images/right-arrow.png" class="menu-icon-img" width="20" height="20" alt="">
+                <span class="menu-label">View</span>
             </a>
+            <span class="tooltip-label">View</span>
         </li>
 
     </ul>
 
     <div class="logout">
-        <a href="#" onclick="showLogoutConfirmation(event)">𓉘➜ Log Out</a>
+        <a href="#" onclick="showLogoutConfirmation(event)">
+            <span style="font-size:18px; flex-shrink:0;">𓉘➜</span>
+            <span class="logout-text">Log Out</span>
+        </a>
+        <span class="tooltip-label">Log Out</span>
     </div>
 </div>
 
 <!-- ═══════════ MAIN CONTENT ═══════════ -->
-<div class="main-content">
+<div class="main-content" id="mainContent">
     <header>
         <div class="title-row">
             <div class="bank-section">
+                <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
                 <div class="bank-icon">🏦</div>
                 <h1 class="bank-title" id="bankNameTitle">Loading...</h1>
             </div>
@@ -231,6 +229,51 @@
 </div>
 
 <script>
+// ── Sidebar collapse / expand ──────────────────────────────────────────────
+var isCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
+
+function applyState() {
+    var sidebar = document.getElementById('sidebar');
+    var mc      = document.getElementById('mainContent');
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        document.body.classList.add('sidebar-collapsed');
+        mc.style.marginLeft = '62px';
+        mc.style.width      = 'calc(100% - 62px)';
+    } else {
+        sidebar.classList.remove('collapsed');
+        document.body.classList.remove('sidebar-collapsed');
+        mc.style.marginLeft = '250px';
+        mc.style.width      = 'calc(100% - 250px)';
+    }
+    sessionStorage.setItem('sidebarCollapsed', isCollapsed);
+}
+
+function toggleSidebar() {
+    isCollapsed = !isCollapsed;
+    applyState();
+}
+
+applyState(); // apply immediately to avoid flash
+
+// ── Tooltip positioning via JS (fixed coordinates) ────────────────────────
+// We use JS to set the top position so tooltips always align with the hovered item.
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipItems = document.querySelectorAll('.menu li, .logout');
+
+    tooltipItems.forEach(function (item) {
+        var tip = item.querySelector('.tooltip-label');
+        if (!tip) return;
+
+        item.addEventListener('mouseenter', function () {
+            if (!isCollapsed) return; // only show when sidebar is collapsed
+            var rect = item.getBoundingClientRect();
+            tip.style.top  = (rect.top + rect.height / 2) + 'px';
+            tip.style.transform = 'translateY(-50%) translateX(0)';
+        });
+    });
+});
+
 // ── Password change modal ──────────────────────────────────────────────────
 <% if (needsPasswordChange) { %>
 window.addEventListener('DOMContentLoaded', function() {
@@ -269,7 +312,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
     var err = document.getElementById('errorAlert');
     var btn = document.getElementById('submitBtn');
     err.style.display = 'none';
-    if (np !== cp) { err.textContent = '❌ Passwords do not match!'; err.style.display='block'; return; }
+    if (np !== cp)  { err.textContent = '❌ Passwords do not match!';   err.style.display='block'; return; }
     if (!np.trim()) { err.textContent = '❌ Password cannot be empty!'; err.style.display='block'; return; }
     btn.disabled = true; btn.textContent = 'Changing Password...';
     var xhr = new XMLHttpRequest();
@@ -324,9 +367,9 @@ function updateWorkingDateAndBankName() {
         .then(function(r) { return r.json(); })
         .then(function(d) {
             if (d.error) {
-                document.getElementById('workingDate').innerText    = 'Error: ' + d.error;
-                document.getElementById('bankNameTitle').innerText  = 'Error Loading Bank Name';
-                document.getElementById('branchName').innerText     = 'Error';
+                document.getElementById('workingDate').innerText   = 'Error: ' + d.error;
+                document.getElementById('bankNameTitle').innerText = 'Error Loading Bank Name';
+                document.getElementById('branchName').innerText    = 'Error';
             } else {
                 document.getElementById('workingDate').innerText   = 'Working Date: ' + d.workingDate;
                 document.getElementById('bankNameTitle').innerText = d.bankName ? d.bankName.toUpperCase() : '';
@@ -338,7 +381,7 @@ function updateWorkingDateAndBankName() {
                 sessionStorage.setItem('branchCode',  d.branchCode);
             }
         })
-        .catch(function(e) {
+        .catch(function() {
             document.getElementById('workingDate').innerText   = 'Connection Error';
             document.getElementById('bankNameTitle').innerText = 'Connection Error';
             document.getElementById('branchName').innerText    = 'Error';
@@ -398,10 +441,10 @@ window.onload = function() {
 // ── Logout ─────────────────────────────────────────────────────────────────
 function showLogoutConfirmation(event) {
     event.preventDefault();
-    document.getElementById('logoutModal').style.display = 'block';
+    document.getElementById('logoutModal').classList.add('show');
 }
 function closeLogoutModal() {
-    document.getElementById('logoutModal').style.display = 'none';
+    document.getElementById('logoutModal').classList.remove('show');
 }
 function confirmLogout() {
     sessionStorage.clear();
