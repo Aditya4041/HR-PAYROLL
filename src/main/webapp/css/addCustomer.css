@@ -1,0 +1,659 @@
+body {
+      background-color: #e8e4fc; /* soft violet */
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    fieldset {
+      background: #e8e4fc; /* same as body */
+      border: 2px solid #aaa;
+      margin: 10px 0px 32px 0px;
+      padding: 15px 20px;
+      min-width: 320px;
+      border-radius: 9px;
+    }
+
+    legend {
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 1.18em;
+      padding: 0 10px;
+      color: #373279;
+    }
+
+    /* Grid Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px 20px;
+    }
+
+    .form-grid div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 13px;
+      margin-bottom: 3px;
+      font-weight: bold;
+      color: #373279;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="email"],
+    select {
+      padding: 4px 6px;
+      font-size: 13px;
+      width: 95%;
+      box-sizing: border-box;
+    }
+
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+    }
+
+    input[type="radio"] {
+      transform: scale(0.9);
+    }
+
+    .full-width {
+      grid-column: span 4;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .full-width {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        margin: 10px;
+      }
+
+      fieldset {
+        padding: 10px 15px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full-width {
+        grid-column: span 1;
+      }
+
+      label {
+        font-size: 12px;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="email"],
+      select {
+        width: 100%;
+        font-size: 12px;
+      }
+
+      legend {
+        font-size: 1em;
+      }
+    }
+
+    /* Additional styling for non-grid sections */
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .form-label {
+      min-width: 140px;
+      font-weight: bold;
+      color: #373279;
+      font-size: 13px;
+    }
+
+    .form-input {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .form-label {
+        min-width: auto;
+      }
+      .form-input {
+        width: 100%;
+      }
+    }
+    
+   /* PERSONAL INFO SPECIFIC */
+.personal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 25px;
+  align-items: start;
+}
+
+.personal-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.personal-grid label {
+  min-width: 10px;
+      font-size: 13px;
+      margin-bottom: 3px;
+      font-weight: bold;
+      color: #373279;
+}
+
+.personal-grid input[type="text"],
+.personal-grid input[type="number"] {
+  width: 90%;
+  font-size: 13px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+
+.personal-grid .radio-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.personal-grid .full-width {
+  grid-column: span 3;
+  width: 95%;
+}
+
+/* Responsive layout */
+@media (max-width: 900px) {
+  .personal-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .personal-grid .full-width {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .personal-grid {
+    grid-template-columns: 1fr;
+  }
+  .personal-grid .full-width {
+    grid-column: span 1;
+  }
+}
+
+
+/* ADDRESS INFO GRID */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 25px;
+  align-items: start;
+}
+
+.address-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.address-grid label {
+  font-weight: bold;
+  color: #373279;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.address-grid input[type="text"],
+.address-grid input[type="number"],
+.address-grid select {
+  width: 78%;
+  font-size: 13px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+
+.address-grid .full-width {
+  grid-column: span 3;
+  width: 95%;
+}
+
+@media (max-width: 900px) {
+  .address-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .address-grid .full-width {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .address-grid {
+    grid-template-columns: 1fr;
+  }
+  .address-grid .full-width {
+    grid-column: span 1;
+  }
+}
+
+/*for kyc fieldset */
+
+
+.kyc-row {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.kyc-section {
+  flex: 1 1 48%;
+  min-width: 300px;
+}
+
+.kyc-section h4 {
+  color:#373279;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.kyc-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kyc-section th {
+  color: #373279;
+  font-weight: bold;
+  text-align: left;
+  padding-bottom: 4px;
+}
+
+.kyc-section td {
+  color: #373279;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 4px 6px;
+}
+
+.kyc-section input[type="text"],
+.kyc-section input[type="date"] {
+  width: 90%;
+  padding: 3px 5px;
+  border: 1px solid #888;
+  font-size: 0.9rem;
+}
+
+/* Vertical Divider */
+.kyc-divider {
+  width: 2px;
+  background-color: #666;
+  margin: 0 15px;
+}
+
+/* Divider Between Rows */
+hr {
+  border: 0;
+  border-top: 1px solid #888;
+  margin: 15px 0;
+}
+
+/* ✅ Bigger Checkboxes Styling */
+input[type="checkbox"] {
+  width: 20px !important;   /* increase width */
+  height: 20px !important;  /* increase height */
+  cursor: pointer;
+}
+
+/* ✅ Center checkboxes neatly in table cells */
+td input[type="checkbox"] {
+  vertical-align: middle;
+  display: block;
+  margin: 0px 0px 0px 0px;
+}
+
+input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* 🔹 Responsive Adjustments */
+@media (max-width: 900px) {
+  .kyc-row {
+    flex-direction: column;
+  }
+
+  .kyc-section {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .kyc-divider {
+    display: none;
+  }
+
+  .kyc-section input[type="text"],
+  .kyc-section input[type="date"] {
+    width: 100%;
+  }
+
+  .kyc-section table {
+    font-size: 0.9rem;
+  }
+}
+
+ /* Button Styling */
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 25px 0;
+  gap: 20px;
+}
+
+.form-buttons button {
+  background-color: #373279;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.form-buttons button:hover {
+  background-color: #2b0d73;
+  transform: scale(1.05);
+}
+
+.form-buttons button:active {
+  transform: scale(0.97);
+}
+
+/* Responsive buttons for small screens */
+@media (max-width: 600px) {
+  .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-buttons button {
+    width: 80%;
+    padding: 10px;
+  }
+}
+
+
+
+
+/* Hide arrows in Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+}
+
+/* Hide arrows in Firefox */
+input[type=number] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+
+
+
+/* Hide arrows in Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+}
+
+/* Hide arrows in Firefox */
+input[type=number] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* Photo & Signature Upload Section */
+.upload-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.upload-card {
+  background: #f5f3ff;
+  border: 2px dashed #9c8ed8;
+  border-radius: 16px;
+  padding: 30px 25px;
+  width: 280px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover {
+  border-color: #373279;
+  background: #ede9ff;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(55, 50, 121, 0.15);
+}
+
+.upload-card h3 {
+  color: #373279;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.upload-icon-container {
+  background: #e8e4fc;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.upload-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  
+}
+
+.upload-icon-container img.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-text {
+  color: #373279;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 10px 0 5px;
+}
+
+.upload-subtext {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.upload-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.upload-btn {
+  background: #373279;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+  background: #2b0d73;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(55, 50, 121, 0.3);
+}
+
+.upload-btn img {
+  filter: brightness(0) invert(1);
+}
+
+/* Camera Modal Styles */
+.camera-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  animation: fadeIn 0.3s;
+}
+
+.camera-modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 550px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.camera-modal-content h3 {
+  color: #373279;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.camera-close {
+  color: #888;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.camera-close:hover {
+  color: #373279;
+}
+
+.camera-modal video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  background: #000;
+  margin-bottom: 20px;
+}
+
+.camera-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.camera-btn {
+  background: linear-gradient(45deg, #28a745, #34ce57);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.camera-btn:hover {
+  background: linear-gradient(45deg, #218838, #28a745);
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.camera-btn-cancel {
+  background: linear-gradient(45deg, #6c757d, #5a6268);
+}
+
+.camera-btn-cancel:hover {
+  background: linear-gradient(45deg, #5a6268, #495057);
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+}
+
+/* Drag and Drop Styling */
+.upload-card.dragover {
+  border-color: #373279;
+  background: #e0dcff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .upload-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .upload-card {
+    width: 100%;
+    max-width: 350px;
+  }
+  
+  .camera-modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
