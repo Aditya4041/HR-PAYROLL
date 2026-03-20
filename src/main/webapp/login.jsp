@@ -1,4 +1,4 @@
-<%@ page import="java.sql.*, db.DBConnection" %> 
+<%@ page import="java.sql.*, db.DBConnection, db.AESEncryption" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -10,58 +10,90 @@
     String password   = request.getParameter("password");
     String branchCode = request.getParameter("branch");
 
-    String errorMessage        = null;
-    boolean showForm           = true;
-
-    String licensePopupType    = null;
-    String licensePopupMessage = null;
+    String errorMessage = null;
+    boolean showForm    = true;
 
     if (userId != null && password != null && branchCode != null) {
 
-        Connection conn = null;
+        Connection conn        = null;
         PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        ResultSet rs            = null;
 
         try {
             conn = DBConnection.getConnection();
 
-            int dateDiff = 1;
-            /* ---- No universal-parameter licence check for HR; always allow ---- */
-
-            // Validate credentials
+            // ── Fetch encrypted password from DB ────────────────────────────
             String sql =
-                "SELECT USER_ID FROM ACL.USERREGISTER " +
-                "WHERE USER_ID=? AND acl.toolkit.decrypt(PASSWD)=? AND BRANCH_CODE=?";
+                "SELECT USER_ID, PASSWD, CURRENTLOGIN_STATUS " +
+                "FROM ACL.USERREGISTER " +
+                "WHERE USER_ID = ? AND BRANCH_CODE = ?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, userId);
-            pstmt.setString(2, password);
-            pstmt.setString(3, branchCode);
+            pstmt.setString(2, branchCode);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                session.setAttribute("userId",     userId);
-                session.setAttribute("branchCode", branchCode);
+                String encryptedPassword  = rs.getString("PASSWD");
+                String currentLoginStatus = rs.getString("CURRENTLOGIN_STATUS");
 
-                PreparedStatement historyStmt = null;
                 try {
-                    String historySql =
-                        "INSERT INTO ACL.USERREGISTERLOGINHISTORY " +
-                        "(USER_ID, BRANCH_CODE, LOGIN_TIME) VALUES (?, ?, SYSDATE)";
-                    historyStmt = conn.prepareStatement(historySql);
-                    historyStmt.setString(1, userId);
-                    historyStmt.setString(2, branchCode);
-                    historyStmt.executeUpdate();
-                } catch (Exception historyEx) {
-                    System.err.println("Login history error: " + historyEx.getMessage());
-                } finally {
-                    try { if (historyStmt != null) historyStmt.close(); } catch (Exception ignored) {}
+                    // ── Java-side AES decryption (matches CBS project) ──────
+                    String decryptedPassword = AESEncryption.decrypt(encryptedPassword);
+
+                    if (decryptedPassword.equals(password)) {
+
+                        if ("L".equals(currentLoginStatus)) {
+                            errorMessage = "User is already logged in from another session. Please contact administrator.";
+                        } else {
+                            session.setAttribute("userId",     userId);
+                            session.setAttribute("branchCode", branchCode);
+
+                            // ── Login history insert ────────────────────────
+                            PreparedStatement historyStmt = null;
+                            try {
+                                String historySql =
+                                    "INSERT INTO ACL.USERREGISTERLOGINHISTORY " +
+                                    "(USER_ID, BRANCH_CODE, LOGIN_TIME) VALUES (?, ?, SYSDATE)";
+                                historyStmt = conn.prepareStatement(historySql);
+                                historyStmt.setString(1, userId);
+                                historyStmt.setString(2, branchCode);
+                                historyStmt.executeUpdate();
+                            } catch (Exception historyEx) {
+                                System.err.println("Login history error: " + historyEx.getMessage());
+                            } finally {
+                                try { if (historyStmt != null) historyStmt.close(); } catch (Exception ignored) {}
+                            }
+
+                            // ── Mark user as logged in ──────────────────────
+                            PreparedStatement statusStmt = null;
+                            try {
+                                String statusSql =
+                                    "UPDATE ACL.USERREGISTER SET CURRENTLOGIN_STATUS = 'L' " +
+                                    "WHERE USER_ID = ? AND BRANCH_CODE = ?";
+                                statusStmt = conn.prepareStatement(statusSql);
+                                statusStmt.setString(1, userId);
+                                statusStmt.setString(2, branchCode);
+                                statusStmt.executeUpdate();
+                            } catch (Exception ignored) {}
+                            finally {
+                                try { if (statusStmt != null) statusStmt.close(); } catch (Exception ignored2) {}
+                            }
+
+                            response.sendRedirect("main.jsp");
+                            showForm = false;
+                        }
+
+                    } else {
+                        errorMessage = "Invalid username or password.";
+                    }
+
+                } catch (Exception decryptEx) {
+                    // If decryption fails the stored password format is wrong
+                    errorMessage = "Invalid username or password.";
                 }
 
-                response.sendRedirect("main.jsp");
-                showForm = false;
-
             } else {
-                errorMessage = "Invalid username or password";
+                errorMessage = "Invalid username or password.";
             }
 
         } catch (Exception e) {
@@ -91,7 +123,7 @@
     <div class="bank-brand">
         <img src="images/idsspl_logo.gif" alt="Logo" class="bank-logo">
         <div class="brand-title">HR PAYROLL SYSTEM</div>
-        <div class="brand-sub">Human Resource & Payroll Management - Secure Access</div>
+        <div class="brand-sub">Human Resource &amp; Payroll Management - Secure Access</div>
     </div>
 
     <form action="login.jsp" method="post" autocomplete="off">
@@ -102,19 +134,20 @@
 
         <div style="flex:1; min-width:280px; text-align:left;">
 
+            <!-- Branch -->
             <select id="branch" name="branch" class="form-control" required>
                 <option value="">-- Select Branch --</option>
                 <%
-                    try (Connection conn = DBConnection.getConnection();
-                         java.sql.Statement stmt = conn.createStatement();
-                         ResultSet branchRS = stmt.executeQuery(
+                    try (Connection connBr = DBConnection.getConnection();
+                         java.sql.Statement stmtBr = connBr.createStatement();
+                         ResultSet branchRS = stmtBr.executeQuery(
                              "SELECT BRANCH_CODE, NAME FROM HEADOFFICE.BRANCH ORDER BY BRANCH_CODE")) {
                         while (branchRS.next()) {
-                            String bCode = branchRS.getString("BRANCH_CODE");
-                            String bName = branchRS.getString("NAME");
+                            String bCode   = branchRS.getString("BRANCH_CODE");
+                            String bName   = branchRS.getString("NAME");
                             boolean selected = bCode.equals(request.getParameter("branch"));
                 %>
-                            <option value="<%=bCode%>" <%=selected?"selected":""%>>
+                            <option value="<%=bCode%>" <%=selected ? "selected" : ""%>>
                                 <%=bCode%> - <%=bName%>
                             </option>
                 <%
@@ -125,10 +158,12 @@
                 %>
             </select>
 
+            <!-- User ID -->
             <input type="text" placeholder="Enter User ID" id="username" name="username"
                    class="form-control" required
                    value="<%=userId != null ? userId : ""%>">
 
+            <!-- Password -->
             <div class="password-container">
                 <input type="password" placeholder="Enter Password" id="password" name="password"
                        class="form-control" required>
@@ -138,8 +173,17 @@
 
             <button type="submit" class="btn-login">Login</button>
 
+            <!-- Error messages -->
             <% if (errorMessage != null) { %>
-                <div class="error-message"><%= errorMessage %></div>
+                <% if (errorMessage.contains("already logged in")) { %>
+                    <div class="error-message" style="color:#856404; background:#fff3cd; border:1px solid #ffc107; padding:10px; border-radius:4px; margin-top:10px;">
+                        ⚠️ <%= errorMessage %>
+                    </div>
+                <% } else { %>
+                    <div class="error-message">
+                        <%= errorMessage %>
+                    </div>
+                <% } %>
             <% } %>
 
             <div class="help-row">

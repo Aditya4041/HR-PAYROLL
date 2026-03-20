@@ -535,8 +535,8 @@
                       style="resize:vertical;width:95%;border: 2px solid #C8B7F6;"></textarea>         
         </div>
         <div class="full-width" style="grid-column:span 1;">
-            <label>Address 1</label>
-            <textarea id="address1" name="address1" rows="2"
+            <label>Address 3</label>
+            <textarea id="address3" name="address3" rows="2"
                       style="resize:vertical;width:95%;border: 2px solid #C8B7F6;"></textarea>
         </div>
     </div>
