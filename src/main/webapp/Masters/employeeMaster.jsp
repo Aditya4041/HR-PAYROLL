@@ -347,17 +347,17 @@
             <div>
                 <label>Address 1</label>
                 <textarea id="address1" name="address1" rows="2"
-                          style="resize:vertical;width:95%;border:2px solid #C8B7F6;"></textarea>
+                          style="resize:vertical;width:90%;border:2px solid #C8B7F6;"></textarea>
             </div>
             <div>
                 <label>Address 2</label>
                 <textarea id="address2" name="address2" rows="2"
-                          style="resize:vertical;width:95%;border:2px solid #C8B7F6;"></textarea>
+                          style="resize:vertical;width:90%;border:2px solid #C8B7F6;"></textarea>
             </div>
             <div>
                 <label>Address 3</label>
                 <textarea id="address3" name="address3" rows="2"
-                          style="resize:vertical;width:95%;border:2px solid #C8B7F6;"></textarea>
+                          style="resize:vertical;width:90%;border:2px solid #C8B7F6;"></textarea>
             </div>
         </div>
 
@@ -372,11 +372,11 @@
                         try {
                             connCity = DBConnection.getConnection();
                             PreparedStatement psCity = connCity.prepareStatement(
-                                "SELECT CITY_CODE, CITY_NAME FROM HEADOFFICE.CITY_MASTER ORDER BY CITY_NAME");
+                                "SELECT CITY_CODE, NAME FROM GLOBALCONFIG.CITY ORDER BY NAME");
                             ResultSet rsCity = psCity.executeQuery();
                             while (rsCity.next()) { %>
                                 <option value="<%= rsCity.getString("CITY_CODE") %>">
-                                    <%= rsCity.getString("CITY_NAME") %></option>
+                                    <%= rsCity.getString("NAME") %></option>
                         <% } rsCity.close(); psCity.close();
                         } catch (Exception eC) { /* skip */ }
                         finally { if (connCity!=null) try{connCity.close();}catch(Exception ig){} }
