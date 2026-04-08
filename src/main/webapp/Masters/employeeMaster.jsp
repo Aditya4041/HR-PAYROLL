@@ -13,7 +13,48 @@
         response.sendRedirect("login.jsp");
         return;
     }
+
+    // ════════════════════════════════════════════════════════════
+    // ── AJAX Handler: Get Next Employee ID ──────────────────────
+    // ════════════════════════════════════════════════════════════
+    String ajaxAction = request.getParameter("getNextId");
+    if ("1".equals(ajaxAction)) {
+        response.setContentType("application/json; charset=UTF-8");
+        
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DBConnection.getConnection();
+            
+            String query = "SELECT COALESCE(MAX(CAST(EMP_NO AS INTEGER)), 0) + 1 AS NEXT_ID " +
+                          "FROM PAYROLL.EMPLOYEE_MST";
+            
+            ps = conn.prepareStatement(query);
+            rs = ps.executeQuery();
+            
+            int nextId = 0;
+            if (rs.next()) {
+                nextId = rs.getInt("NEXT_ID");
+            }
+            
+            out.write("{\"success\": true, \"nextId\": " + nextId + "}");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (Exception ig) {}
+        }
+        return;
+    }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -320,8 +361,8 @@
             <div>
                 <label>Marital Status</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="maritalStatus" value="M"> Married</label>
-                    <label><input type="radio" name="maritalStatus" value="U" checked> Unmarried</label>
+                    <label><input type="radio" name="maritalStatus" value="M" id="married" onchange="toggleMaritalFields()"> Married </lable>
+					<label><input type="radio" name="maritalStatus" value="U" id="unmarried" checked onchange="toggleMaritalFields()"> Unmarried </lable>
                 </div>
             </div>
         </div>
@@ -456,8 +497,8 @@
         <%-- Joining Date | Employee Type | Sequence No --%>
         <div class="personal-grid">
             <div>
-                <label>Joining Date <span style="color:#e53935;">*</span></label>
-                <input type="date" id="joiningDate" name="joiningDate" required>
+                <label>Joining Date</label>
+                <input type="date" id="joiningDate" name="joiningDate" >
             </div>
             <div>
                 <label>Employee Type</label>
@@ -663,6 +704,29 @@ function showPopup(type, title, sub) {
 function closePopup() {
     document.getElementById('empPopupOverlay').classList.remove('show');
 }
+// for spouse 
+function toggleMaritalFields() {
+    var isMarried = document.getElementById('married').checked;
+
+    var spouse = document.getElementById('spouse');
+    var rel    = document.getElementById('relWithSpouse');
+
+    if (isMarried) {
+        spouse.disabled = false;
+        rel.disabled    = false;
+    } else {
+        spouse.disabled = true;
+        rel.disabled    = true;
+
+        // Clear values when disabled
+        spouse.value = '';
+        rel.value    = '';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+    toggleMaritalFields();
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 function clearForm() {
@@ -721,12 +785,28 @@ function saveEmployee(e) {
         .catch(function(){ showPopup('error', 'Network Error', 'Could not reach server.'); });
 }
 
-// ── Auto-generate ID button ───────────────────────────────────────────────
-document.getElementById('autoIdBtn').addEventListener('click', function () {
+// ════════════════════════════════════════════════════════════════════════════
+// ── Auto-generate Employee ID button (UPDATED) ────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', function () {
     var empIdField = document.getElementById('employeeId');
-    if (!parseInt(empIdField.value)) {
-        empIdField.placeholder = 'AUTO';
-    }
+
+    fetch('<%= request.getRequestURI() %>?getNextId=1', { method: 'GET' })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.success && data.nextId) {
+                empIdField.value = data.nextId;
+                console.log('Next Employee ID: ' + data.nextId);
+            } else {
+                showPopup('error', 'Error', 'Could not fetch next Employee ID');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            showPopup('error', 'Network Error', 'Could not reach server.');
+        });
 });
 
 // ── Close popup on backdrop / Escape ─────────────────────────────────────
