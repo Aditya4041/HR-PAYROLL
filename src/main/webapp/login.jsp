@@ -162,7 +162,20 @@
         <div class="card-right">
 
             <div class="greeting">Back Again !</div>
-            <div class="bank-name">HR PAYROLL SYSTEM</div>
+
+            <div class="bank-name">
+                <%
+                    String loginBankName = "Demo Bank/Society Ltd.";
+                    try (Connection connBank = DBConnection.getConnection();
+                         PreparedStatement psBank = connBank.prepareStatement(
+                             "SELECT NAME FROM GLOBALCONFIG.BANK WHERE BANK_CODE = ?")) {
+                        psBank.setString(1, "0100");
+                        ResultSet rsBank = psBank.executeQuery();
+                        if (rsBank.next()) loginBankName = rsBank.getString("NAME");
+                    } catch (Exception ignored) {}
+                %>
+                THE <%= loginBankName.toUpperCase() %>
+            </div>
 
             <!-- Main Login Form -->
             <form action="login.jsp" method="post" autocomplete="off">
