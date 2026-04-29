@@ -110,99 +110,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HR Payroll - Secure Login</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
-<div class="login-container">
+<!-- Arc pattern background -->
+<div class="bg-arc"></div>
 
-    <div class="bank-brand">
-        <img src="images/idsspl_logo.gif" alt="Logo" class="bank-logo">
-        <div class="brand-title">HR PAYROLL SYSTEM</div>
-        <div class="brand-sub">Human Resource &amp; Payroll Management - Secure Access</div>
-    </div>
-
-    <form action="login.jsp" method="post" autocomplete="off">
-
-        <div style="flex:1.4; display:flex; justify-content:center; align-items:center;">
-            <img src="images/image.gif" alt="HR Payroll System Illustration">
-        </div>
-
-        <div style="flex:1; min-width:280px; text-align:left;">
-
-            <!-- Branch -->
-            <select id="branch" name="branch" class="form-control" required>
-                <option value="">-- Select Branch --</option>
-                <%
-                    try (Connection connBr = DBConnection.getConnection();
-                         java.sql.Statement stmtBr = connBr.createStatement();
-                         ResultSet branchRS = stmtBr.executeQuery(
-                             "SELECT BRANCH_CODE, NAME FROM HEADOFFICE.BRANCH ORDER BY BRANCH_CODE")) {
-                        while (branchRS.next()) {
-                            String bCode   = branchRS.getString("BRANCH_CODE");
-                            String bName   = branchRS.getString("NAME");
-                            boolean selected = bCode.equals(request.getParameter("branch"));
-                %>
-                            <option value="<%=bCode%>" <%=selected ? "selected" : ""%>>
-                                <%=bCode%> - <%=bName%>
-                            </option>
-                <%
-                        }
-                    } catch (Exception ex) {
-                        out.println("<option>Error loading branches</option>");
-                    }
-                %>
-            </select>
-
-            <!-- User ID -->
-            <input type="text" placeholder="Enter User ID" id="username" name="username"
-                   class="form-control" required
-                   value="<%=userId != null ? userId : ""%>">
-
-            <!-- Password -->
-            <div class="password-container">
-                <input type="password" placeholder="Enter Password" id="password" name="password"
-                       class="form-control" required>
-                <img src="images/eye.png" id="eyeIcon" class="eye-icon"
-                     alt="Show" onclick="togglePassword()">
-            </div>
-
-            <button type="submit" class="btn-login">Login</button>
-
-            <!-- Error messages -->
-            <% if (errorMessage != null) { %>
-                <% if (errorMessage.contains("already logged in")) { %>
-                    <div class="error-message" style="color:#856404; background:#fff3cd; border:1px solid #ffc107; padding:10px; border-radius:4px; margin-top:10px;">
-                        ⚠️ <%= errorMessage %>
-                    </div>
-                <% } else { %>
-                    <div class="error-message">
-                        <%= errorMessage %>
-                    </div>
-                <% } %>
-            <% } %>
-
-            <div class="help-row">
-                <a href="#">Forgot Password?</a>
-            </div>
-        </div>
-    </form>
-
-    <div class="login-footer">
-        &copy; 2025 HR Payroll System. All rights reserved.
+<!-- Licence modal overlay -->
+<div id="licenseOverlay">
+    <div id="licenseBox">
+        <div id="licenseIcon"></div>
+        <div id="licenseTitle"></div>
+        <p id="licenseMessage"></p>
+        <div id="licenseContact">
+            📞 Contact IDSSPL Support &nbsp;|&nbsp;
+            <a href="https://idsspl.com/" target="_blank">infokop@idsspl.com</a>
+        </div><br>
+        <button id="licenseOkBtn" onclick="handleLicenseOk()">OK</button>
     </div>
 </div>
 
-<script>
-const passwordInput = document.getElementById("password");
-const eyeIcon       = document.getElementById("eyeIcon");
-eyeIcon.style.display = "none";
+<!-- ── PAGE WRAPPER ── -->
+<div class="page-wrapper">
 
-function togglePassword() {
+    <div class="login-card">
+
+        <!-- LEFT — illustration panel -->
+        <div class="card-left">
+            <div class="card-left-content">
+
+                <img src="images/online_banking.png" alt="HR Payroll Illustration" class="banking-img">
+
+                <!-- Product badge -->
+                <div class="product-badge">
+                    <div class="product-badge-top">
+                        <span class="product-dot"></span>
+                        <span class="product-name">HR Payroll System</span>
+                        <span class="product-version">v1.0</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT — form -->
+        <div class="card-right">
+
+            <div class="greeting">Back Again !</div>
+            <div class="bank-name">HR PAYROLL SYSTEM</div>
+
+            <!-- Main Login Form -->
+            <form action="login.jsp" method="post" autocomplete="off">
+
+                <!-- Branch -->
+                <div class="field-row">
+                    <label for="branch">Branch</label>
+                    <select id="branch" name="branch" required>
+                        <option value="">— Select Branch —</option>
+                        <%
+                            try (Connection connBr = DBConnection.getConnection();
+                                 java.sql.Statement stmtBr = connBr.createStatement();
+                                 ResultSet branchRS = stmtBr.executeQuery(
+                                     "SELECT BRANCH_CODE, NAME FROM HEADOFFICE.BRANCH ORDER BY BRANCH_CODE")) {
+                                while (branchRS.next()) {
+                                    String bCode   = branchRS.getString("BRANCH_CODE");
+                                    String bName   = branchRS.getString("NAME");
+                                    boolean sel    = bCode.equals(request.getParameter("branch"));
+                        %>
+                                <option value="<%= bCode %>" <%= sel ? "selected" : "" %>><%= bCode %> — <%= bName %></option>
+                        <%
+                                }
+                            } catch (Exception ex) {
+                                out.println("<option>Error loading branches</option>");
+                            }
+                        %>
+                    </select>
+                </div>
+
+                <!-- User Name -->
+                <div class="field-row">
+                    <label for="username">User Name</label>
+                    <input type="text" id="username" name="username" placeholder=" " required
+                           value="<%= userId != null ? userId : "" %>">
+                    <img src="images/user1.png" class="f-icon" alt="">
+                </div>
+
+                <!-- Password -->
+                <div class="field-row">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder=" " required>
+                    <img src="images/password_lock.png" id="lockIcon" class="f-icon" alt="">
+                    <img src="images/eye.png" id="eyeIcon" class="eye-btn" alt="show/hide" style="display:none;">
+                </div>
+
+                <!-- Forgot -->
+                <div class="forgot-row"><a href="#">Forgot Password?</a></div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-login">Login</button>
+
+                <!-- Error messages -->
+                <% if (errorMessage != null) { %>
+                    <% if (errorMessage.contains("already logged in")) { %>
+                        <div class="alert alert-warning">
+                            <svg viewBox="0 0 20 20"><path d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/></svg>
+                            <%= errorMessage %>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-error">
+                            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                            <%= errorMessage %>
+                        </div>
+                    <% } %>
+                <% } %>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="page-footer">
+    <span class="footer-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a96a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+        11, "Gurukrupa" Friends Colony Kolhapur 416005
+    </span>
+    <span class="footer-sep">|</span>
+    <span class="footer-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a96a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.62 12 19.79 19.79 0 0 1 1.55 3.41 2 2 0 0 1 3.53 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.06 6.06l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +91 2312530950
+    </span>
+    <span class="footer-sep">|</span>
+    <span class="footer-icon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a96a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        www.infokop@idsspl.com
+    </span>
+</div>
+
+<script>
+// ── Password Eye Toggle ──
+var passwordInput = document.getElementById("password");
+var eyeIcon       = document.getElementById("eyeIcon");
+var lockIcon      = document.getElementById("lockIcon");
+
+passwordInput.addEventListener("input", function () {
+    var hasValue = passwordInput.value.length > 0;
+    lockIcon.style.display = hasValue ? "none"  : "block";
+    eyeIcon.style.display  = hasValue ? "block" : "none";
+});
+
+eyeIcon.addEventListener("click", function () {
     if (passwordInput.type === "password") {
         passwordInput.type = "text";
         eyeIcon.src = "images/eye-hide.png";
@@ -210,10 +274,14 @@ function togglePassword() {
         passwordInput.type = "password";
         eyeIcon.src = "images/eye.png";
     }
-}
-passwordInput.addEventListener("input", function () {
-    eyeIcon.style.display = passwordInput.value.length > 0 ? "block" : "none";
 });
+
+function handleLicenseOk() {
+    document.getElementById('licenseOverlay').classList.remove('show');
+    if (window._licenseRedirect) {
+        window.location.href = 'main.jsp';
+    }
+}
 </script>
 
 </body>
